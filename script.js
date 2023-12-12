@@ -1,12 +1,11 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc } from "firebase/firestore";
-
 
 // Firebase configuration
 const firebaseConfig = {
     apiKey: process.env.FIREBASE_API_KEY,
     authDomain: process.env.FIREBASE_AUTH_DOMAIN,
     projectId: process.env.FIREBASE_PROJECT_ID,
+    databaseURL: process.env.FIREBASE_DATABASE_URL,
     storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
     messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
     appId: process.env.FIREBASE_APP_ID
@@ -14,7 +13,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = getDatabase(app);
 
 function initMap() {
     var map = L.map('map').setView([41.0082, 28.9784], 13); // Istanbul coordinates
@@ -24,36 +23,37 @@ function initMap() {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    map.on('click', async function(e) {
+    map.on('click', function(e) {
         var customText = prompt("Enter text for the pin:", "Default Text");
         if (customText != null && customText !== "") {
             var newPin = { lat: e.latlng.lat, lng: e.latlng.lng, text: customText };
-            try {
-                const docRef = await addDoc(collection(db, "pins"), newPin);
-                addMarker(newPin, map, docRef.id);
-            } catch (error) {
-                console.error("Error adding document: ", error);
-            }
+            var newPinRef = ref(db, 'pins/' + Date.now()); // Use a unique key for each pin
+            set(newPinRef, newPin);
+            addMarker(newPin, map, newPinRef.key);
         }
     });
 
     // Load existing pins
-    getDocs(collection(db, "pins")).then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            var data = doc.data();
-            addMarker(data, map, doc.id);
-        });
+    const pinsRef = ref(db, 'pins');
+    onValue(pinsRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            Object.keys(data).forEach(key => {
+                addMarker(data[key], map, key);
+            });
+        }
     });
 }
 
-function addMarker(pin, map, docId) {
+function addMarker(pin, map, pinKey) {
     var marker = L.marker([pin.lat, pin.lng]).addTo(map)
         .bindPopup(pin.text)
         .on('click', function() {
             var confirmDeletion = confirm("Are you sure you want to delete this pin?");
             if (confirmDeletion) {
                 this.remove(); // Remove marker from map
-                deleteDoc(doc(db, "pins", docId)); // Remove pin data from Firebase
+                const pinRef = ref(db, 'pins/' + pinKey);
+                remove(pinRef); // Remove pin data from Firebase
             }
         });
 }
