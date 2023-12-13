@@ -6,12 +6,13 @@
   "name": "istanbul-map",
   "description": "",
   "version": "1.0.0",
-  "main": "script.js",
   "devDependencies": {
-    "parcel": "^2.0.0"
+    "parcel": "^2.0.0",
+    "process": "^0.11.10",
+    "rimraf": "^5.0.5"
   },
   "scripts": {
-    "clean": "rm -rf node_modules dist && npm cache clean --force && npm install",
+    "clean": "rimraf node_modules dist && npm cache clean --force && npm install",
     "build": "parcel build index.html --dist-dir docs --public-url /istanbul-map/",
     "rebuild": "npm run clean && npm run build",
     "start": "parcel index.html",
