@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, onValue, remove } from "firebase/database";
 
