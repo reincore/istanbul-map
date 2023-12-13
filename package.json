@@ -14,7 +14,7 @@
   },
   "scripts": {
     "clean": "rm -rf node_modules dist && npm cache clean --force && npm install",
-    "build": "parcel build index.html",
+    "build": "parcel build index.html --out-dir docs",
     "rebuild": "npm run clean && npm run build",
     "start": "parcel index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
