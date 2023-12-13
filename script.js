@@ -59,6 +59,11 @@ function initMap() {
     });
 
     // Load existing pins
+    loadPins(map);
+}
+
+// Load pins from Firebase
+function loadPins(map) {
     const pinsRef = ref(db, 'pins');
     onValue(pinsRef, (snapshot) => {
         const data = snapshot.val();
@@ -76,7 +81,6 @@ function addPin(latlng, map) {
         var newPin = { lat: latlng.lat, lng: latlng.lng, text: customText };
         var newPinRef = ref(db, 'pins/' + Date.now()); // Use a unique key for each pin
         set(newPinRef, newPin);
-        addMarker(newPin, map, newPinRef.key);
     }
 }
 
