@@ -48,7 +48,7 @@ function initMap() {
 
 function addMarker(pin, map, pinKey) {
     var marker = L.marker([pin.lat, pin.lng]).addTo(map)
-        .bindPopup(pin.text)
+        .bindTooltip(pin.text, {permanent: true})
         .on('click', function() {
             var confirmDeletion = confirm("Are you sure you want to delete this pin?");
             if (confirmDeletion) {
