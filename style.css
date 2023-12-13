@@ -8,4 +8,14 @@ body, html {
     height: 100%;
 }
 
-/*  additional styles TBA */
+/* Tooltip styling */
+.leaflet-tooltip {
+  font-size: 16px;
+  font-weight: bold;
+  color: rgb(139, 0, 0) !important;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+

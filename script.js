@@ -17,21 +17,25 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 function initMap() {
-    var map = L.map('map').setView([41.0082, 28.9784], 13); // Istanbul coordinates
+    var map = L.map('map').setView([41.0082, 28.9784], 14); // Istanbul coordinates
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    map.on('click', function(e) {
-        var customText = prompt("Enter text for the pin:", "Default Text");
-        if (customText != null && customText !== "") {
-            var newPin = { lat: e.latlng.lat, lng: e.latlng.lng, text: customText };
-            var newPinRef = ref(db, 'pins/' + Date.now()); // Use a unique key for each pin
-            set(newPinRef, newPin);
-            addMarker(newPin, map, newPinRef.key);
-        }
+    // Long press event logic
+    let longPressTimeout;
+    const longPressDuration = 1000; // 1000 milliseconds = 1 second
+
+    map.on('mousedown touchstart', function(e) {
+        longPressTimeout = setTimeout(function() {
+            addPin(e.latlng, map);
+        }, longPressDuration);
+    });
+
+    map.on('mouseup touchend', function() {
+        clearTimeout(longPressTimeout);
     });
 
     // Load existing pins
@@ -44,6 +48,16 @@ function initMap() {
             });
         }
     });
+}
+
+function addPin(latlng, map) {
+    var customText = prompt("Enter text for the pin:", "Default Text");
+    if (customText != null && customText !== "") {
+        var newPin = { lat: latlng.lat, lng: latlng.lng, text: customText };
+        var newPinRef = ref(db, 'pins/' + Date.now()); // Use a unique key for each pin
+        set(newPinRef, newPin);
+        addMarker(newPin, map, newPinRef.key);
+    }
 }
 
 function addMarker(pin, map, pinKey) {
