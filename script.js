@@ -84,11 +84,19 @@ function addMarker(pin, map, pinKey) {
     var marker = L.marker([pin.lat, pin.lng]).addTo(map)
         .bindTooltip(pin.text, {permanent: true})
         .on('dblclick', function() {
-            var confirmDeletion = confirm("Are you sure you want to delete this pin?");
-            if (confirmDeletion) {
-                this.remove(); // Remove marker from map
-                const pinRef = ref(db, 'pins/' + pinKey);
-                remove(pinRef); // Remove pin data from Firebase
-            }
+            confirmAndRemovePin(this, pinKey, map);
         });
+}
+
+// Confirm and remove pin function
+function confirmAndRemovePin(marker, pinKey, map) {
+    var confirmDeletion = confirm("Are you sure you want to delete this pin?");
+    if (confirmDeletion) {
+        const pinRef = ref(db, 'pins/' + pinKey);
+        remove(pinRef).then(() => {
+            map.removeLayer(marker); // Remove marker from the map
+        }).catch((error) => {
+            console.error("Error removing pin:", error);
+        });
+    }
 }
