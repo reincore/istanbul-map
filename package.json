@@ -15,7 +15,7 @@
     "clean": "rm -rf node_modules dist && npm cache clean --force && npm install",
     "build": "parcel build index.html",
     "rebuild": "npm run clean && npm run build",
-    "start": "http-server dist -p 8080 -c-1",
+    "start": "parcel index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
