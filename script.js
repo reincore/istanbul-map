@@ -19,6 +19,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth();
 
+
 window.login = function() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -29,10 +30,9 @@ window.login = function() {
             initMap();
         })
         .catch((error) => {
-            // Show error message
             document.getElementById('login-error').textContent = "Failed to login: " + error.message;
         });
-}
+};
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -45,16 +45,15 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-
 function initMap() {
-    var map = L.map('map', { doubleClickZoom: false }).setView([41.0082, 28.9784], 14); // Istanbul coordinates
+    var map = L.map('map', { doubleClickZoom: false }).setView([41.0082, 28.9784], 14);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-   map.on('dblclick', function(e) {
+    map.on('dblclick', function(e) {
         addPin(e.latlng, map);
     });
 
@@ -62,7 +61,6 @@ function initMap() {
     loadPins(map);
 }
 
-// Load pins from Firebase
 function loadPins(map) {
     const pinsRef = ref(db, 'pins');
     onValue(pinsRef, (snapshot) => {
@@ -79,26 +77,29 @@ function addPin(latlng, map) {
     var customText = prompt("Enter text for the pin:", "Default Text");
     if (customText != null && customText !== "") {
         var newPin = { lat: latlng.lat, lng: latlng.lng, text: customText };
-        var newPinRef = ref(db, 'pins/' + Date.now()); // Use a unique key for each pin
-        set(newPinRef, newPin);
+        var newPinRef = ref(db, 'pins/' + Date.now());
+        set(newPinRef, newPin).then((result) => {
+            // Add the new marker immediately after it's added to Firebase
+            addMarker({ lat: latlng.lat, lng: latlng.lng, text: customText }, map, newPinRef.key);
+        });
     }
 }
 
 function addMarker(pin, map, pinKey) {
-    var marker = L.marker([pin.lat, pin.lng]).addTo(map)
+    var marker = L.marker([pin.lat, pin.lng])
         .bindTooltip(pin.text, {permanent: true})
+        .addTo(map)
         .on('dblclick', function() {
-            confirmAndRemovePin(this, pinKey, map);
+            confirmAndRemovePin(marker, pinKey, map);
         });
 }
 
-// Confirm and remove pin function
 function confirmAndRemovePin(marker, pinKey, map) {
     var confirmDeletion = confirm("Are you sure you want to delete this pin?");
     if (confirmDeletion) {
         const pinRef = ref(db, 'pins/' + pinKey);
         remove(pinRef).then(() => {
-            map.removeLayer(marker); // Remove marker from the map
+            map.removeLayer(marker); // Remove the marker immediately
         }).catch((error) => {
             console.error("Error removing pin:", error);
         });
