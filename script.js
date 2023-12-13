@@ -1,7 +1,8 @@
-require('dotenv').config();
-
+import dotenv from 'dotenv';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, onValue, remove } from "firebase/database";
+
+dotenv.config();
 
 // Firebase configuration
 const firebaseConfig = {
