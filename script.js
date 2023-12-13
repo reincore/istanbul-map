@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, onValue, remove } from "firebase/database";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+
 
 // Firebase configuration
 const firebaseConfig = {
@@ -15,27 +17,45 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth();
+
+window.login = function() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+            // Login successful, hide login container and initialize map
+            document.getElementById('login-container').style.display = 'none';
+            initMap();
+        })
+        .catch((error) => {
+            // Show error message
+            document.getElementById('login-error').textContent = "Failed to login: " + error.message;
+        });
+}
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // User is signed in, hide login container and initialize map
+        document.getElementById('login-container').style.display = 'none';
+        initMap();
+    } else {
+        // User is signed out, show the login container
+        document.getElementById('login-container').style.display = 'block';
+    }
+});
+
 
 function initMap() {
-    var map = L.map('map').setView([41.0082, 28.9784], 14); // Istanbul coordinates
+    var map = L.map('map', { doubleClickZoom: false }).setView([41.0082, 28.9784], 14); // Istanbul coordinates
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // Long press event logic
-    let longPressTimeout;
-    const longPressDuration = 1000; // 1000 milliseconds = 1 second
-
-    map.on('mousedown touchstart', function(e) {
-        longPressTimeout = setTimeout(function() {
-            addPin(e.latlng, map);
-        }, longPressDuration);
-    });
-
-    map.on('mouseup touchend', function() {
-        clearTimeout(longPressTimeout);
+   map.on('dblclick', function(e) {
+        addPin(e.latlng, map);
     });
 
     // Load existing pins
@@ -63,7 +83,7 @@ function addPin(latlng, map) {
 function addMarker(pin, map, pinKey) {
     var marker = L.marker([pin.lat, pin.lng]).addTo(map)
         .bindTooltip(pin.text, {permanent: true})
-        .on('click', function() {
+        .on('dblclick', function() {
             var confirmDeletion = confirm("Are you sure you want to delete this pin?");
             if (confirmDeletion) {
                 this.remove(); // Remove marker from map
@@ -72,7 +92,3 @@ function addMarker(pin, map, pinKey) {
             }
         });
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    initMap();
-});
