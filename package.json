@@ -1,6 +1,6 @@
 {
   "browser": {
-    "process": "process/browser"
+    "process": "./node_modules/process/browser.js"
   },
   "dependencies": {
     "firebase": "^10.7.1",
