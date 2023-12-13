@@ -15,7 +15,7 @@
     "rimraf": "^5.0.5"
   },
   "scripts": {
-    "clean": "rimraf node_modules dist && npm cache clean --force && npm install",
+    "clean": "rimraf .parcel-cache .cache docs node_modules dist && npm cache clean --force && npm install",
     "build": "parcel build index.html --dist-dir docs --public-url /istanbul-map/",
     "rebuild": "npm run clean && npm run build",
     "start": "parcel index.html",
