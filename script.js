@@ -49,7 +49,7 @@ function initMap() {
     var map = L.map('map', { doubleClickZoom: false }).setView([41.0082, 28.9784], 14);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
+        maxZoom: 22,
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
