@@ -25,8 +25,9 @@ window.login = function() {
     const password = document.getElementById('password').value;
     signInWithEmailAndPassword(auth, email, password)
         .then(() => {
-            // Login successful, hide login container and initialize map
+            // Login successful, hide login container and show the map
             document.getElementById('login-container').style.display = 'none';
+            document.getElementById('map').style.display = 'block';
             initMap();
         })
         .catch((error) => {
@@ -36,12 +37,14 @@ window.login = function() {
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        // User is signed in, hide login container and initialize map
+        // User is signed in, hide login container and show the map
         document.getElementById('login-container').style.display = 'none';
+        document.getElementById('map').style.display = 'block';
         initMap();
     } else {
-        // User is signed out, show the login container
+        // User is signed out, show the login container and hide the map
         document.getElementById('login-container').style.display = 'block';
+        document.getElementById('map').style.display = 'none';
     }
 });
 
