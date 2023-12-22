@@ -19,6 +19,16 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 300px;
+    z-index: 1000;
+    position: relative; 
+}
+
+@media (max-width: 600px) {
+    #login-container {
+        width: 90%; 
+        margin: 0 auto; 
+        padding: 20px;
+    }
 }
 
 #login-container h2 {
