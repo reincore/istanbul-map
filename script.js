@@ -62,6 +62,32 @@ function initMap() {
 
     // Load existing pins
     loadPins(map);
+
+    // Show current location
+    showCurrentLocation(map);
+
+    var lastSearchResult = null; 
+
+    // Add geocoder search bar
+    L.Control.geocoder({
+        defaultMarkGeocode: false
+    })
+    .on('markgeocode', function(e) {
+        // Remove the last search result's rectangle if it exists
+        if (lastSearchResult) {
+            map.removeLayer(lastSearchResult);
+        }
+
+        var bbox = e.geocode.bbox;
+        lastSearchResult = L.polygon([
+            bbox.getSouthEast(),
+            bbox.getNorthEast(),
+            bbox.getNorthWest(),
+            bbox.getSouthWest()
+        ]).addTo(map);
+        map.fitBounds(lastSearchResult.getBounds());
+    })
+    .addTo(map);
 }
 
 function loadPins(map) {
@@ -106,5 +132,24 @@ function confirmAndRemovePin(marker, pinKey, map) {
         }).catch((error) => {
             console.error("Error removing pin:", error);
         });
+    }
+}
+
+function showCurrentLocation(map) {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var currentLocation = new L.LatLng(position.coords.latitude, position.coords.longitude);
+            // Create a custom icon
+            var pulseIcon = L.divIcon({
+                className: 'pulse-icon',
+                iconSize: [1, 1]
+            });
+
+            // Use the custom icon for the marker
+            L.marker(currentLocation, {icon: pulseIcon}).addTo(map);
+            map.setView(currentLocation, 14);
+        });
+    } else {
+        console.log("Geolocation is not supported by this browser.");
     }
 }

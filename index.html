@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html>
 <head>
     <title>Deniz'in İstanbul Haritası</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <!-- Leaflet Geocoder CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 </head>
 <body>
     <div id="login-container">
@@ -17,9 +19,13 @@
 
     <div id="map" style="display: none;"></div>
 
-    <!-- Firebase and Leaflet JS -->
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <!-- Leaflet Geocoder JS -->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <!-- Firebase JS -->
     <script src="https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js"></script>
+    <!-- Your custom script -->
     <script type="module" src="/script.js"></script>
 </body>
 </html>
